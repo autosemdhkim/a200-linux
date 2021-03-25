@@ -1,0 +1,70 @@
+// Definitions for ADAU1977 ADC
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2708";
+
+
+	fragment@0 {
+		target = <&i2s>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@1 {
+		target = <&i2c1>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+
+                        asi_vib2: asi_vib2@4b {
+				#sound-dai-cells = <0>;
+				compatible = "asi,asi_vib2";
+				reg = <0x4b>;
+				status = "okay";
+                                avdd-supply = <&vdd_3v3_reg>;
+                                dvdd-supply = <&vdd_3v3_reg>;
+                                iovdd-supply = <&vdd_3v3_reg>;
+			};
+		};
+	};
+        fragment@2 {
+                target = <&sound>;
+                __overlay__ {
+                        compatible = "simple-audio-card";
+			i2s-controller = <&i2s>;
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+
+                        simple-audio-card,name = "Autosemantics VIB2";
+                        simple-audio-card,widgets =
+                                "Line", "Line In Jack 1",
+                                "Line", "Line In Jack 2",
+                                "Line", "Line In Jack 3",
+                                "Line", "Line In Jack 4";
+                        simple-audio-card,routing =
+                                "Line In Jack 1", "VINL1",
+                                "Line In Jack 1", "VINR1",
+                                "Line In Jack 2", "VINL2",
+                                "Line In Jack 2", "VINR2",
+                                "Line In Jack 3", "VINL3",
+                                "Line In Jack 3", "VINR3",
+                                "Line In Jack 4", "VINL4",
+				"Line In Jack 4", "VINR4";
+
+                        simple-audio-card,format = "i2s";
+
+                        simple-audio-card,cpu {
+                                sound-dai = <&i2s>;
+                        };
+                        simple-audio-card,codec {
+                                sound-dai = <&asi_vib2>;
+                        };
+                };
+	};
+};
